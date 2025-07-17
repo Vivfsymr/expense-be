@@ -21,4 +21,5 @@ namespace ExpenseBe.Data.Repositories
             return await _categories.Find(_ => true).ToListAsync();
         }
     }
+    
 } 
