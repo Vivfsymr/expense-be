@@ -4,6 +4,7 @@ using ExpenseBe.Core.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
+using ExpenseBe.API.DTOs;
 
 namespace ExpenseBe.API.Controllers
 {
@@ -19,61 +20,205 @@ namespace ExpenseBe.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetAll()
+        public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetAll()
         {
-            var expenses = await _expenseService.GetAllExpensesAsync();
-            return Ok(expenses);
+            try
+            {
+                var expenses = await _expenseService.GetAllExpensesAsync();
+            return Ok(new ApiResponse<IEnumerable<Expense>>
+            {
+                Success = true,
+                Message = "Expenses fetched successfully",
+                Data = expenses
+            });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<IEnumerable<Expense>>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = new List<Expense>()
+                });
+            }   
+            
         }
 
         [HttpGet("{id}")]
-        public async Task<ActionResult<Expense>> GetById(string id)
+        public async Task<ActionResult<ApiResponse<Expense>>> GetById(string id)
         {
-            var expense = await _expenseService.GetExpenseByIdAsync(id);
-            if (expense == null)
-                return NotFound();
+            try
+            {
+                var expense = await _expenseService.GetExpenseByIdAsync(id);
+                if (expense == null)
+                    return NotFound();
 
-            return Ok(expense);
+            return Ok(new ApiResponse<Expense>
+            {
+                Success = true,
+                Message = "Expense fetched successfully",
+                Data = expense
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<Expense>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = null
+                });
+            }
         }
 
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetByUserId(string userId, [FromQuery] int? month, [FromQuery] int? year)
+        [HttpGet("getByQuery/{userId}")]
+        public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetByUserId(string userId, [FromQuery] int? month, [FromQuery] int? year)
         {
-            var expenses = await _expenseService.GetExpensesByUserIdAsync(userId, month, year);
-            return Ok(expenses);
+            try
+            {
+                var expenses = await _expenseService.GetExpensesByUserIdAsync(userId, month, year);
+                return Ok(new ApiResponse<IEnumerable<Expense>>
+                {
+                Success = true,
+                Message = "Expenses fetched successfully",
+                    Data = expenses
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<IEnumerable<Expense>>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = new List<Expense>()
+                });
+            }
         }
 
         [HttpGet("for-user/{forUserId}")]
-        public async Task<ActionResult<IEnumerable<Expense>>> GetByForUserId(string forUserId)
+            public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetByForUserId(string forUserId)
         {
-            var expenses = await _expenseService.GetExpensesByForUserIdAsync(forUserId);
-            return Ok(expenses);
+            try
+            {
+                var expenses = await _expenseService.GetExpensesByForUserIdAsync(forUserId);
+                return Ok(new ApiResponse<IEnumerable<Expense>>
+                {
+                Success = true,
+                Message = "Expenses fetched successfully",
+                Data = expenses
+            });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<IEnumerable<Expense>>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = new List<Expense>()
+                });
+            }
         }
 
         [HttpPost]
-        public async Task<ActionResult<Expense>> Create(Expense expense)
+            public async Task<ActionResult<ApiResponse<Expense>>> Create(Expense expense)
         {
-            var createdExpense = await _expenseService.CreateExpenseAsync(expense);
-            return CreatedAtAction(nameof(GetById), new { id = createdExpense.Id }, createdExpense);
+            try
+            {
+                var createdExpense = await _expenseService.CreateExpenseAsync(expense);
+                return CreatedAtAction(nameof(GetById), new { id = createdExpense.Id }, new ApiResponse<Expense>
+                    {
+                    Success = true,
+                    Message = "Expense created successfully",
+                    Data = createdExpense
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<Expense>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(string id, Expense expense)
+        public async Task<ActionResult<ApiResponse<Expense>>> Update(string id, Expense expense)
         {
-            var success = await _expenseService.UpdateExpenseAsync(id, expense);
-            if (!success)
-                return NotFound();
+            try
+            {
+                var success = await _expenseService.UpdateExpenseAsync(id, expense);
+                if (!success)
+                    return NotFound();
 
-            return NoContent();
+            return Ok(new ApiResponse<Expense>
+            {
+                Success = true,
+                Message = "Expense updated successfully",
+                    Data = expense
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<Expense>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = null
+                });
+            }
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<ActionResult<ApiResponse<Expense>>> Delete(string id)
         {
-            var success = await _expenseService.DeleteExpenseAsync(id);
-            if (!success)
-                return NotFound();
+            try
+            {
+                var success = await _expenseService.DeleteExpenseAsync(id);
+                if (!success)
+                    return NotFound();  
 
-            return NoContent();
+                return Ok(new ApiResponse<Expense>
+                {
+                    Success = true,
+                    Message = "Expense deleted successfully",
+                    Data = null
+                }); 
+            }
+                catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<Expense>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = null
+                });
+            }
+        }
+        
+        [HttpGet("RealExpenses/{forUserId}")]
+        public async Task<ActionResult<ApiResponse<decimal>>> GetRealExpenses(string forUserId, [FromQuery] int? month, [FromQuery] int? year)
+        {
+            try
+            {
+                var total = await _expenseService.GetRealExpensesAsync(forUserId, month, year);
+                return Ok(new ApiResponse<decimal>
+                {
+                    Success = true,
+                    Message = "Real expenses calculated successfully",
+                    Data = total
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<decimal>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = 0
+                });
+            }
         }
     }
 }

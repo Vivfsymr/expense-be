@@ -30,12 +30,14 @@ builder.Services.AddScoped<IExpenseRepository, ExpenseRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IStatusRepository, StatusRepository>();
+builder.Services.AddScoped<IIncomeRepository, IncomeRepository>();
 
 // Add Services
 builder.Services.AddScoped<IExpenseService, ExpenseService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IStatusService, StatusService>();
+builder.Services.AddScoped<IIncomeService, IncomeService>();
 
 var app = builder.Build();
 

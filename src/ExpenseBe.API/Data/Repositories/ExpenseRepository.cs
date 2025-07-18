@@ -10,10 +10,11 @@ namespace ExpenseBe.Data.Repositories
     public class ExpenseRepository : IExpenseRepository
     {
         private readonly IMongoCollection<Expense> _expenses;
-
+        private readonly IMongoCollection<Income> _incomes;
         public ExpenseRepository(MongoDbContext context)
         {
             _expenses = context.Expenses;
+            _incomes = context.Incomes;
         }
 
         public async Task<IEnumerable<Expense>> GetAllAsync()
@@ -34,7 +35,7 @@ namespace ExpenseBe.Data.Repositories
                 var monthFilter = Builders<Expense>.Filter.Where(x => x.Date.Month == month.Value && x.Date.Year == year.Value);
                 filter = Builders<Expense>.Filter.And(filter, monthFilter);
             }
-            return await _expenses.Find(filter).ToListAsync();
+            return await _expenses.Find(filter).SortByDescending(x => x.Date).ToListAsync();
         }
 
         public async Task<IEnumerable<Expense>> GetByForUserIdAsync(string forUserId)
@@ -64,6 +65,25 @@ namespace ExpenseBe.Data.Repositories
         {
             var result = await _expenses.DeleteOneAsync(x => x.Id == id);
             return result.DeletedCount > 0;
+        }
+
+        public async Task<decimal> GetRealExpensesAsync(string forUserId, int? month = null, int? year = null)
+        {
+            var incomeFilter = Builders<Income>.Filter.Eq(x => x.ForUserId, forUserId);
+            var expenseFilter = Builders<Expense>.Filter.Eq(x => x.ForUserId, forUserId);
+
+            if (month.HasValue && year.HasValue)
+            {
+                var dateIncomeFilter = Builders<Income>.Filter.Where(x => x.Date.Month == month.Value && x.Date.Year == year.Value);
+                var dateExpenseFilter = Builders<Expense>.Filter.Where(x => x.Date.Month == month.Value && x.Date.Year == year.Value);
+                incomeFilter = Builders<Income>.Filter.And(incomeFilter, dateIncomeFilter);
+                expenseFilter = Builders<Expense>.Filter.And(expenseFilter, dateExpenseFilter);
+            }
+
+            var totalIncomes = await _incomes.Find(incomeFilter).ToListAsync();
+            var totalExpenses = await _expenses.Find(expenseFilter).ToListAsync();
+            var total = totalIncomes.Sum(x => x.Amount) - totalExpenses.Sum(x => x.Amount);
+            return total;
         }
     }
 } 

@@ -3,6 +3,7 @@ using ExpenseBe.Core.Models;
 using ExpenseBe.Core.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using ExpenseBe.API.DTOs;
 
 namespace ExpenseBe.API.Controllers
 {
@@ -18,10 +19,27 @@ namespace ExpenseBe.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Status>>> GetAll()
+        public async Task<ActionResult<ApiResponse<IEnumerable<Status>>>> GetAll()
         {
-            var statuses = await _statusService.GetAllStatusesAsync();
-            return Ok(statuses);
+            try
+            {
+                var statuses = await _statusService.GetAllStatusesAsync();
+                return Ok(new ApiResponse<IEnumerable<Status>>
+                {
+                    Success = true,
+                    Message = "Statuses fetched successfully",
+                    Data = statuses
+                });
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<IEnumerable<Status>>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = new List<Status>()
+                });
+            }
         }
     }
 } 

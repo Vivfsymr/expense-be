@@ -14,5 +14,6 @@ namespace ExpenseBe.Core.Services
         Task<Expense> CreateExpenseAsync(Expense expense);
         Task<bool> UpdateExpenseAsync(string id, Expense expense);
         Task<bool> DeleteExpenseAsync(string id);
+        Task<decimal> GetRealExpensesAsync(string forUserId, int? month = null, int? year = null);
     }
 } 

@@ -20,5 +20,6 @@ namespace ExpenseBe.Data.Context
         public IMongoCollection<User> Users => _database.GetCollection<User>("users");
         public IMongoCollection<Category> Categories => _database.GetCollection<Category>("categories");
         public IMongoCollection<Status> Statuses => _database.GetCollection<Status>("statuses");
+        public IMongoCollection<Income> Incomes => _database.GetCollection<Income>("incomes");
     }
 } 

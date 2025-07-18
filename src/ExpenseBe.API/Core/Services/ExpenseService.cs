@@ -53,5 +53,10 @@ namespace ExpenseBe.Core.Services
         {
             return await _expenseRepository.DeleteAsync(id);
         }
+
+        public async Task<decimal> GetRealExpensesAsync(string forUserId, int? month = null, int? year = null)
+        {
+            return await _expenseRepository.GetRealExpensesAsync(forUserId, month, year);
+        }
     }
 }

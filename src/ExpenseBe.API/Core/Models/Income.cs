@@ -4,7 +4,7 @@ using System;
 
 namespace ExpenseBe.Core.Models
 {
-    public class Expense
+    public class Income
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -15,12 +15,6 @@ namespace ExpenseBe.Core.Models
 
         [BsonElement("amount")]
         public decimal Amount { get; set; }
-
-        [BsonElement("category")]
-        public string Category { get; set; } = string.Empty;
-
-        [BsonElement("status")]
-        public string? Status { get; set; }
 
         [BsonElement("date")]
         public DateTime Date { get; set; }
