@@ -230,6 +230,7 @@ namespace ExpenseBe.API.Controllers
             try
             {
                 var expenses = await _expenseService.GetExpensesByUserIdAsync(forUserId, month, year);
+                expenses = expenses.OrderBy(e => e.Date);
                 var excelBytes = await _excelExportService.ExportExpensesToExcel(expenses);
                 
                 var fileName = $"expenses_{forUserId}";

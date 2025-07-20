@@ -154,6 +154,7 @@ namespace ExpenseBe.API.Controllers
             try
             {
                 var incomes = await _incomeService.GetIncomesByForUserIdAsync(forUserId, month, year);
+                incomes = incomes.OrderBy(i => i.Date);
                 var excelBytes = _excelExportService.ExportIncomesToExcel(incomes);
                 
                 var fileName = $"incomes_{forUserId}";
