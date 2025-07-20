@@ -1,4 +1,4 @@
- using ExpenseBe.Core.Interfaces;
+using ExpenseBe.Core.Interfaces;
 using ExpenseBe.Core.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -59,4 +59,4 @@ namespace ExpenseBe.Core.Services
             return await _expenseRepository.GetRealExpensesAsync(forUserId, month, year);
         }
     }
-}
+} 
