@@ -41,6 +41,11 @@ namespace ExpenseBe.Data.Repositories
             return await _incomes.Find(x => x.Id == id).FirstOrDefaultAsync();
         }
 
+        public async Task<IEnumerable<Income>> GetAllAsync()
+        {
+            return await _incomes.Find(_ => true).SortByDescending(x => x.Date).ToListAsync();
+        }
+
         public async Task<IEnumerable<Income>> GetByForUserIdAsync(string forUserId, int? month = null, int? year = null, int? day = null)
         {
             var filter = Builders<Income>.Filter.Eq(x => x.ForUserId, forUserId);

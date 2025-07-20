@@ -34,6 +34,11 @@ namespace ExpenseBe.Core.Services
             return await _incomeRepository.GetByIdAsync(id);
         }
 
+        public async Task<IEnumerable<Income>> GetAllIncomesAsync()
+        {
+            return await _incomeRepository.GetAllAsync();
+        }
+
         public async Task<IEnumerable<Income>> GetIncomesByForUserIdAsync(string forUserId, int? month = null, int? year = null, int? day = null)
         {
             return await _incomeRepository.GetByForUserIdAsync(forUserId, month, year, day);

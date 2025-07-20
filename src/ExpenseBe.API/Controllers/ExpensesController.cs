@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ExpenseBe.Core.Models;
 using ExpenseBe.Core.Services;
+using ExpenseBe.Core.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
@@ -13,10 +14,12 @@ namespace ExpenseBe.API.Controllers
     public class ExpensesController : ControllerBase
     {
         private readonly IExpenseService _expenseService;
+        private readonly IExcelExportService _excelExportService;
 
-        public ExpensesController(IExpenseService expenseService)
+        public ExpensesController(IExpenseService expenseService, IExcelExportService excelExportService)
         {
             _expenseService = expenseService;
+            _excelExportService = excelExportService;
         }
 
         [HttpGet]
@@ -217,6 +220,34 @@ namespace ExpenseBe.API.Controllers
                     Success = false,
                     Message = e.Message,
                     Data = 0
+                });
+            }
+        }
+
+        [HttpGet("export-excel/{forUserId}")]
+        public async Task<IActionResult> ExportToExcelByForUserId(string forUserId, [FromQuery] int? month, [FromQuery] int? year)
+        {
+            try
+            {
+                var expenses = await _expenseService.GetExpensesByUserIdAsync(forUserId, month, year);
+                var excelBytes = await _excelExportService.ExportExpensesToExcel(expenses);
+                
+                var fileName = $"expenses_{forUserId}";
+                if (month.HasValue && year.HasValue)
+                {
+                    fileName += $"_{year}_{month:D2}";
+                }
+                fileName += ".xlsx";
+                
+                return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<object>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = null
                 });
             }
         }
