@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using ExpenseBe.Core.Models;
 using ExpenseBe.Core.Services;
+using ExpenseBe.Core.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
@@ -13,10 +14,12 @@ namespace ExpenseBe.API.Controllers
     public class IncomesController : ControllerBase
     {
         private readonly IIncomeService _incomeService;
+        private readonly IExcelExportService _excelExportService;
 
-        public IncomesController(IIncomeService incomeService)
+        public IncomesController(IIncomeService incomeService, IExcelExportService excelExportService)
         {
             _incomeService = incomeService;
+            _excelExportService = excelExportService;
         }
 
         [HttpGet("getByQuery/{forUserId}")]
@@ -137,6 +140,34 @@ namespace ExpenseBe.API.Controllers
             catch (Exception e)
             {
                 return BadRequest(new ApiResponse<Income>
+                {
+                    Success = false,
+                    Message = e.Message,
+                    Data = null
+                });
+            }
+        }
+
+        [HttpGet("export-excel/{forUserId}")]
+        public async Task<IActionResult> ExportToExcelByForUserId(string forUserId, [FromQuery] int? month, [FromQuery] int? year)
+        {
+            try
+            {
+                var incomes = await _incomeService.GetIncomesByForUserIdAsync(forUserId, month, year);
+                var excelBytes = _excelExportService.ExportIncomesToExcel(incomes);
+                
+                var fileName = $"incomes_{forUserId}";
+                if (month.HasValue && year.HasValue)
+                {
+                    fileName += $"_{year}_{month:D2}";
+                }
+                fileName += ".xlsx";
+                
+                return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(new ApiResponse<object>
                 {
                     Success = false,
                     Message = e.Message,
