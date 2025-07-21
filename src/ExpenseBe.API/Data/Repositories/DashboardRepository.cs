@@ -57,7 +57,7 @@ namespace ExpenseBe.Data.Repositories
                     NameOfMonth = monthName,
                     TotalMonthAmountExpense = monthExpenses.Sum(e => e.Amount),
                     TotalMonthAmountIncome = monthIncomes.Sum(i => i.Amount),
-                    TotalMonthAmountRealExpense = monthExpenses.Sum(e => e.Amount),
+                    TotalMonthAmountRealExpense = monthIncomes.Sum(i => i.Amount) - monthExpenses.Sum(e => e.Amount),
                     EachSummaryMonthOfCategories = eachSummaryMonthOfCategories
                 };
                 summary.SummaryMonths.Add(summaryMonth);
