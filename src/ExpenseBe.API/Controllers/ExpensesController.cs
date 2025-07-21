@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using ExpenseBe.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseBe.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class ExpensesController : ControllerBase
@@ -22,18 +24,19 @@ namespace ExpenseBe.API.Controllers
             _excelExportService = excelExportService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetAll()
         {
             try
             {
                 var expenses = await _expenseService.GetAllExpensesAsync();
-            return Ok(new ApiResponse<IEnumerable<Expense>>
-            {
-                Success = true,
-                Message = "Expenses fetched successfully",
-                Data = expenses
-            });
+                return Ok(new ApiResponse<IEnumerable<Expense>>
+                {
+                    Success = true,
+                    Message = "Expenses fetched successfully",
+                    Data = expenses
+                });
             }
             catch (Exception e)
             {
@@ -43,10 +46,11 @@ namespace ExpenseBe.API.Controllers
                     Message = e.Message,
                     Data = new List<Expense>()
                 });
-            }   
-            
+            }
+
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<Expense>>> GetById(string id)
         {
@@ -56,11 +60,11 @@ namespace ExpenseBe.API.Controllers
                 if (expense == null)
                     return NotFound();
 
-            return Ok(new ApiResponse<Expense>
-            {
-                Success = true,
-                Message = "Expense fetched successfully",
-                Data = expense
+                return Ok(new ApiResponse<Expense>
+                {
+                    Success = true,
+                    Message = "Expense fetched successfully",
+                    Data = expense
                 });
             }
             catch (Exception e)
@@ -74,6 +78,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("getByQuery/{userId}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetByUserId(string userId, [FromQuery] int? month, [FromQuery] int? year)
         {
@@ -82,8 +87,8 @@ namespace ExpenseBe.API.Controllers
                 var expenses = await _expenseService.GetExpensesByUserIdAsync(userId, month, year);
                 return Ok(new ApiResponse<IEnumerable<Expense>>
                 {
-                Success = true,
-                Message = "Expenses fetched successfully",
+                    Success = true,
+                    Message = "Expenses fetched successfully",
                     Data = expenses
                 });
             }
@@ -98,18 +103,19 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("for-user/{forUserId}")]
-            public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetByForUserId(string forUserId)
+        public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetByForUserId(string forUserId)
         {
             try
             {
                 var expenses = await _expenseService.GetExpensesByForUserIdAsync(forUserId);
                 return Ok(new ApiResponse<IEnumerable<Expense>>
                 {
-                Success = true,
-                Message = "Expenses fetched successfully",
-                Data = expenses
-            });
+                    Success = true,
+                    Message = "Expenses fetched successfully",
+                    Data = expenses
+                });
             }
             catch (Exception e)
             {
@@ -122,14 +128,15 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
-            public async Task<ActionResult<ApiResponse<Expense>>> Create(Expense expense)
+        public async Task<ActionResult<ApiResponse<Expense>>> Create(Expense expense)
         {
             try
             {
                 var createdExpense = await _expenseService.CreateExpenseAsync(expense);
                 return CreatedAtAction(nameof(GetById), new { id = createdExpense.Id }, new ApiResponse<Expense>
-                    {
+                {
                     Success = true,
                     Message = "Expense created successfully",
                     Data = createdExpense
@@ -146,6 +153,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<Expense>>> Update(string id, Expense expense)
         {
@@ -155,10 +163,10 @@ namespace ExpenseBe.API.Controllers
                 if (!success)
                     return NotFound();
 
-            return Ok(new ApiResponse<Expense>
-            {
-                Success = true,
-                Message = "Expense updated successfully",
+                return Ok(new ApiResponse<Expense>
+                {
+                    Success = true,
+                    Message = "Expense updated successfully",
                     Data = expense
                 });
             }
@@ -173,6 +181,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<Expense>>> Delete(string id)
         {
@@ -180,16 +189,16 @@ namespace ExpenseBe.API.Controllers
             {
                 var success = await _expenseService.DeleteExpenseAsync(id);
                 if (!success)
-                    return NotFound();  
+                    return NotFound();
 
                 return Ok(new ApiResponse<Expense>
                 {
                     Success = true,
                     Message = "Expense deleted successfully",
                     Data = null
-                }); 
+                });
             }
-                catch (Exception e)
+            catch (Exception e)
             {
                 return BadRequest(new ApiResponse<Expense>
                 {
@@ -199,7 +208,8 @@ namespace ExpenseBe.API.Controllers
                 });
             }
         }
-        
+
+        [Authorize]
         [HttpGet("RealExpenses/{forUserId}")]
         public async Task<ActionResult<ApiResponse<decimal>>> GetRealExpenses(string forUserId, [FromQuery] int? month, [FromQuery] int? year)
         {
@@ -224,6 +234,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("export-excel/{forUserId}")]
         public async Task<IActionResult> ExportToExcelByForUserId(string forUserId, [FromQuery] int? month, [FromQuery] int? year)
         {
@@ -232,14 +243,14 @@ namespace ExpenseBe.API.Controllers
                 var expenses = await _expenseService.GetExpensesByUserIdAsync(forUserId, month, year);
                 expenses = expenses.OrderBy(e => e.Date);
                 var excelBytes = await _excelExportService.ExportExpensesToExcel(expenses);
-                
+
                 var fileName = $"expenses_{forUserId}";
                 if (month.HasValue && year.HasValue)
                 {
                     fileName += $"_{year}_{month:D2}";
                 }
                 fileName += ".xlsx";
-                
+
                 return File(excelBytes, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
             }
             catch (Exception e)

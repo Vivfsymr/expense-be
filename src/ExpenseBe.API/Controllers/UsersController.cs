@@ -5,9 +5,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Linq;
 using ExpenseBe.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseBe.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -19,6 +21,7 @@ namespace ExpenseBe.API.Controllers
             _userService = userService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse<IEnumerable<User>>>> GetAll()
         {
@@ -43,6 +46,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<User>>> GetById(string id)
         {
@@ -70,6 +74,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("register")]
         public async Task<ActionResult<ApiResponse<User>>> Register(User user)
         {
@@ -93,24 +98,31 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpPost("login")]
-        public async Task<ActionResult<ApiResponse<User>>> Login([FromBody] User loginUser)
+        public async Task<ActionResult<ApiResponse<LoginResponse>>> Login([FromBody] LoginRequest request)
         {
             try
             {
-                var user = await _userService.LoginAsync(loginUser.Username, loginUser.Password);
-                if (user == null)
-                    return Unauthorized();
-                return Ok(new ApiResponse<User>
+                var loginResult = await _userService.LoginAsync(request);
+                if (loginResult == null)
+                    return Unauthorized(new ApiResponse<LoginResponse>
+                    {
+                        Success = false,
+                        Message = "Invalid username or password",
+                        Data = null
+                    });
+
+                return Ok(new ApiResponse<LoginResponse>
                 {
                     Success = true,
                     Message = "User logged in successfully",
-                    Data = user
+                    Data = loginResult // loginResult.Token sẽ chứa JWT token
                 });
             }
             catch (Exception e)
             {
-                return BadRequest(new ApiResponse<User>
+                return BadRequest(new ApiResponse<LoginResponse>
                 {
                     Success = false,
                     Message = e.Message,
@@ -119,6 +131,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<User>>> Update(string id, User user)
         {
@@ -146,6 +159,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<User>>> Delete(string id)
         {

@@ -6,9 +6,11 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using System;
 using ExpenseBe.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseBe.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class IncomesController : ControllerBase
@@ -22,6 +24,7 @@ namespace ExpenseBe.API.Controllers
             _excelExportService = excelExportService;
         }
 
+        [Authorize]
         [HttpGet("getByQuery/{forUserId}")]
         public async Task<ActionResult<ApiResponse<IEnumerable<Income>>>> GetByForUserId(string forUserId, [FromQuery] int? month, [FromQuery] int? year, [FromQuery] int? day)
         {
@@ -46,6 +49,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<ActionResult<ApiResponse<Income>>> GetById(string id)
         {
@@ -72,6 +76,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<ApiResponse<Income>>> Create(Income income)
         {
@@ -96,6 +101,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<ActionResult<ApiResponse<Income>>> Update(string id, Income income)
         {
@@ -122,6 +128,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<ActionResult<ApiResponse<Income>>> Delete(string id)
         {
@@ -148,6 +155,7 @@ namespace ExpenseBe.API.Controllers
             }
         }
 
+        [Authorize]
         [HttpGet("export-excel/{forUserId}")]
         public async Task<IActionResult> ExportToExcelByForUserId(string forUserId, [FromQuery] int? month, [FromQuery] int? year)
         {

@@ -4,9 +4,11 @@ using ExpenseBe.Core.Services;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ExpenseBe.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseBe.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class StatusesController : ControllerBase
@@ -18,6 +20,7 @@ namespace ExpenseBe.API.Controllers
             _statusService = statusService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse<IEnumerable<Status>>>> GetAll()
         {

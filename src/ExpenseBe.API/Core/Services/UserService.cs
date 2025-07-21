@@ -1,17 +1,24 @@
 using ExpenseBe.Core.Interfaces;
 using ExpenseBe.Core.Models;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using ExpenseBe.API.DTOs;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using MongoDB.Driver;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace ExpenseBe.Core.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
+        private readonly IConfiguration _configuration;
 
-        public UserService(IUserRepository userRepository)
+        public UserService(IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
+            _configuration = configuration;
         }
 
         public async Task<IEnumerable<User>> GetAllUsersAsync()
@@ -44,9 +51,36 @@ namespace ExpenseBe.Core.Services
             return await _userRepository.DeleteAsync(id);
         }
 
-        public async Task<User?> LoginAsync(string username, string password)
+        public async Task<LoginResponse?> LoginAsync(LoginRequest request)
         {
-            return await _userRepository.LoginAsync(username, password);
+            var user = await _userRepository.GetByUsernameAsync(request.Username);
+            if (user == null || user.Password != request.Password)
+                return null;
+
+            // Generate JWT token
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.NameIdentifier, user.Id),
+                    new Claim(ClaimTypes.Name, user.Username)
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var tokenString = tokenHandler.WriteToken(token);
+
+            return new LoginResponse
+            {
+                Token = tokenString,
+                Username = user.Username,
+                Name = user.Name,
+                UserId = user.Id
+            };
         }
+        
     }
 }
