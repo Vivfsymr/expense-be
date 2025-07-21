@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using ExpenseBe.Core.Models;
 using ExpenseBe.Core.Services;
-using System.Collections.Generic;
-using System.Threading.Tasks;
 using ExpenseBe.API.DTOs;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseBe.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class CategoriesController : ControllerBase
@@ -18,6 +18,7 @@ namespace ExpenseBe.API.Controllers
             _categoryService = categoryService;
         }
 
+        [Authorize]
         [HttpGet]
         public async Task<ActionResult<ApiResponse<IEnumerable<Category>>>> GetAll()
         {
@@ -26,10 +27,10 @@ namespace ExpenseBe.API.Controllers
                 var categories = await _categoryService.GetAllCategoriesAsync();
                 return Ok(new ApiResponse<IEnumerable<Category>>
                 {
-                Success = true,
-                Message = "Categories fetched successfully",
-                Data = categories
-            });
+                    Success = true,
+                    Message = "Categories fetched successfully",
+                    Data = categories
+                });
             }
             catch (Exception e)
             {
@@ -42,4 +43,4 @@ namespace ExpenseBe.API.Controllers
             }
         }
     }
-} 
+}

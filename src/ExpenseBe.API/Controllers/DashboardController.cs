@@ -2,9 +2,11 @@ using ExpenseBe.Core.Interfaces;
 using ExpenseBe.Core.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ExpenseBe.API.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class DashboardController : ControllerBase
@@ -16,6 +18,7 @@ namespace ExpenseBe.API.Controllers
             _dashboardService = dashboardService;
         }
 
+        [Authorize]
         [HttpGet("{forUserId}")]
         public async Task<ActionResult<Summary>> GetSummary(string forUserId, [FromQuery] int year)
         {
