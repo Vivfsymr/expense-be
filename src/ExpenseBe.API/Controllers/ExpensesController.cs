@@ -23,32 +23,7 @@ namespace ExpenseBe.API.Controllers
             _expenseService = expenseService;
             _excelExportService = excelExportService;
         }
-
-        [Authorize]
-        [HttpGet]
-        public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetAll()
-        {
-            try
-            {
-                var expenses = await _expenseService.GetAllExpensesAsync();
-                return Ok(new ApiResponse<IEnumerable<Expense>>
-                {
-                    Success = true,
-                    Message = "Expenses fetched successfully",
-                    Data = expenses
-                });
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new ApiResponse<IEnumerable<Expense>>
-                {
-                    Success = false,
-                    Message = e.Message,
-                    Data = new List<Expense>()
-                });
-            }
-
-        }
+       
 
         [Authorize]
         [HttpGet("{id}")]
@@ -85,31 +60,6 @@ namespace ExpenseBe.API.Controllers
             try
             {
                 var expenses = await _expenseService.GetExpensesByUserIdAsync(userId, month, year);
-                return Ok(new ApiResponse<IEnumerable<Expense>>
-                {
-                    Success = true,
-                    Message = "Expenses fetched successfully",
-                    Data = expenses
-                });
-            }
-            catch (Exception e)
-            {
-                return BadRequest(new ApiResponse<IEnumerable<Expense>>
-                {
-                    Success = false,
-                    Message = e.Message,
-                    Data = new List<Expense>()
-                });
-            }
-        }
-
-        [Authorize]
-        [HttpGet("for-user/{forUserId}")]
-        public async Task<ActionResult<ApiResponse<IEnumerable<Expense>>>> GetByForUserId(string forUserId)
-        {
-            try
-            {
-                var expenses = await _expenseService.GetExpensesByForUserIdAsync(forUserId);
                 return Ok(new ApiResponse<IEnumerable<Expense>>
                 {
                     Success = true,

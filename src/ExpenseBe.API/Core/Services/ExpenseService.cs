@@ -14,25 +14,11 @@ namespace ExpenseBe.Core.Services
             _expenseRepository = expenseRepository;
         }
 
-        public async Task<IEnumerable<Expense>> GetAllExpensesAsync()
-        {
-            return await _expenseRepository.GetAllAsync();
-        }
-
-        public async Task<IEnumerable<Expense>> GetExpensesByUserIdAsync(string userId)
-        {
-            return await _expenseRepository.GetByUserIdAsync(userId);
-        }
-
         public async Task<IEnumerable<Expense>> GetExpensesByUserIdAsync(string userId, int? month, int? year)
         {
             return await _expenseRepository.GetByUserIdAsync(userId, month, year);
         }
-
-        public async Task<IEnumerable<Expense>> GetExpensesByForUserIdAsync(string forUserId)
-        {
-            return await _expenseRepository.GetByForUserIdAsync(forUserId);
-        }
+       
 
         public async Task<Expense?> GetExpenseByIdAsync(string id)
         {

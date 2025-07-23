@@ -17,16 +17,6 @@ namespace ExpenseBe.Data.Repositories
             _incomes = context.Incomes;
         }
 
-        public async Task<IEnumerable<Expense>> GetAllAsync()
-        {
-            return await _expenses.Find(_ => true).ToListAsync();
-        }
-
-        public async Task<IEnumerable<Expense>> GetByUserIdAsync(string userId)
-        {
-            return await _expenses.Find(x => x.UserId == userId).ToListAsync();
-        }
-
         public async Task<IEnumerable<Expense>> GetByUserIdAsync(string userId, int? month, int? year)
         {
             var filter = Builders<Expense>.Filter.Eq(x => x.ForUserId, userId);
@@ -37,11 +27,7 @@ namespace ExpenseBe.Data.Repositories
             }
             return await _expenses.Find(filter).SortByDescending(x => x.Date).ToListAsync();
         }
-
-        public async Task<IEnumerable<Expense>> GetByForUserIdAsync(string forUserId)
-        {
-            return await _expenses.Find(x => x.ForUserId == forUserId).ToListAsync();
-        }
+      
 
         public async Task<Expense?> GetByIdAsync(string id)
         {

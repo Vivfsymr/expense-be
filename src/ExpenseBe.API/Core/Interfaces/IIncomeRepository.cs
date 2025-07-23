@@ -11,7 +11,6 @@ namespace ExpenseBe.Core.Interfaces
         Task<Income> UpdateAsync(string id, Income income);
         Task<bool> DeleteAsync(string id);
         Task<Income?> GetByIdAsync(string id);
-        Task<IEnumerable<Income>> GetAllAsync();
         Task<IEnumerable<Income>> GetByForUserIdAsync(string forUserId, int? month = null, int? year = null, int? day = null);
     }
 } 
