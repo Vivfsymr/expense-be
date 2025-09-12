@@ -1,15 +1,15 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System;
 
 namespace ExpenseBe.Core.Models
 {
-    public class Status
+    public class Word
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = string.Empty;
-
-        [BsonElement("name")]
-        public string Name { get; set; } = string.Empty;
+        public string? _id { get; set; }
+        public string? body { get; set; }
+        public DateTime createAt { get; set; }
     }
-} 
+}
