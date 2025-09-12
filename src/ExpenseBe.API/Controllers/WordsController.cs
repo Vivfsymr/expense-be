@@ -33,5 +33,17 @@ namespace ExpenseBe.API.Controllers
             await _wordService.InsertWordAsync(word);
             return Ok();
         }
+
+        [HttpPost("form")]
+        public async Task<IActionResult> InsertWordFromForm([FromForm] string body)
+        {
+            var word = new Word 
+            { 
+                body = body, 
+                createAt = System.DateTime.UtcNow 
+            };
+            await _wordService.InsertWordAsync(word);
+            return Ok();
+        }
     }
 }
