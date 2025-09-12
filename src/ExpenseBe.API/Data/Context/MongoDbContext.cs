@@ -16,10 +16,8 @@ namespace ExpenseBe.Data.Context
             _database = client.GetDatabase(databaseName);
         }
 
-        public IMongoCollection<Expense> Expenses => _database.GetCollection<Expense>("expenses");
         public IMongoCollection<User> Users => _database.GetCollection<User>("users");
-        public IMongoCollection<Category> Categories => _database.GetCollection<Category>("categories");
-        public IMongoCollection<Status> Statuses => _database.GetCollection<Status>("statuses");
-        public IMongoCollection<Income> Incomes => _database.GetCollection<Income>("incomes");
+        public IMongoCollection<Word> Words => _database.GetCollection<Word>("words");
+
     }
 } 
