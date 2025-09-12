@@ -19,10 +19,10 @@ namespace ExpenseBe.API.Controllers
             _wordService = new WordService(repo);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Word>>> GetWords([FromQuery] string orderBy)
+                [HttpGet]
+        public async Task<ActionResult<IEnumerable<Word>>> GetWords([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
         {
-            var words = await _wordService.GetWordsAsync(orderBy);
+            var words = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
             return Ok(words);
         }
 

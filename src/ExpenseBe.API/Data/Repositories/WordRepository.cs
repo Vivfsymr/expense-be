@@ -15,32 +15,38 @@ namespace ExpenseBe.Data.Repositories
             _words = context.Words;
         }
 
-        public async Task<IEnumerable<Word>> GetAllAsync(string orderBy)
+        public async Task<IEnumerable<Word>> GetAllAsync(string? keyword, string? orderBy, int offset = 0, int limit = 50)
         {
-            var query = _words.AsQueryable();
-            List<Word> result;
-            switch (orderBy?.ToLower())
+            var filter = string.IsNullOrWhiteSpace(keyword)
+                ? Builders<Word>.Filter.Empty
+                : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression(keyword, "i"));
+            
+            var sort = orderBy?.ToLower() switch
             {
-                case "alpha":
-                    result = query.OrderBy(w => w.body).ToList();
-                    break;
-                case "beta":
-                    result = query.OrderByDescending(w => w.body).ToList();
-                    break;
-                case "newest":
-                    result = query.OrderByDescending(w => w.createAt).ToList();
-                    break;
-                case "oldest":
-                    result = query.OrderBy(w => w.createAt).ToList();
-                    break;
-                case "random":
-                    result = query.OrderBy(_ => Guid.NewGuid()).ToList();
-                    break;
-                default:
-                    result = query.ToList();
-                    break;
+                "alpha" => Builders<Word>.Sort.Ascending(w => w.body),
+                "beta" => Builders<Word>.Sort.Descending(w => w.body),
+                "newest" => Builders<Word>.Sort.Descending(w => w.createAt),
+                "oldest" => Builders<Word>.Sort.Ascending(w => w.createAt),
+                "random" => null, // Random sẽ xử lý riêng
+                _ => Builders<Word>.Sort.Descending(w => w.createAt)
+            };
+
+            if (orderBy?.ToLower() == "random")
+            {
+                // Random: lấy tất cả rồi shuffle (chỉ nên dùng với ít data)
+                var allResults = await _words.Find(filter).ToListAsync();
+                return allResults.OrderBy(_ => Guid.NewGuid())
+                    .Skip(offset)
+                    .Take(limit);
             }
-            return await Task.FromResult(result);
+
+            var result = await _words.Find(filter)
+                .Sort(sort)
+                .Skip(offset)
+                .Limit(limit)
+                .ToListAsync();
+            
+            return result;
         }
 
         public async Task InsertAsync(Word word)
