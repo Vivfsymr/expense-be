@@ -4,6 +4,7 @@ using ExpenseBe.Data.Context;
 using ExpenseBe.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ExpenseBe.API.Controllers
@@ -37,10 +38,22 @@ namespace ExpenseBe.API.Controllers
         [HttpPost("form")]
         public async Task<IActionResult> InsertWordFromForm([FromForm] string body)
         {
-            var word = new Word 
-            { 
-                body = body, 
-                createAt = System.DateTime.UtcNow 
+            if (string.IsNullOrWhiteSpace(body))
+                return BadRequest("Body is required");
+
+            // Lấy từ đầu tiên trong dòng đầu tiên
+            var firstLine = body.Split('\n', '\r')[0].Trim();
+            var firstWord = firstLine.Split(' ', StringSplitOptions.RemoveEmptyEntries)[0].Trim();
+
+            // Kiểm tra đã tồn tại chưa (tìm word có body bắt đầu bằng từ này)
+            var exists = await _wordService.ExistsByFirstWordAsync(firstWord);
+            if (exists)
+                return Conflict($"Từ đầu tiên '{firstWord}' đã được add trước đó!");
+
+            var word = new Word
+            {
+                body = body,
+                createAt = System.DateTime.UtcNow
             };
             await _wordService.InsertWordAsync(word);
             return Ok();

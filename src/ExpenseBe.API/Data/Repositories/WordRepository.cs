@@ -53,5 +53,11 @@ namespace ExpenseBe.Data.Repositories
         {
             await _words.InsertOneAsync(word);
         }
+
+        public async Task<bool> ExistsByFirstWordAsync(string firstWord)
+        {
+            var filter = Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(firstWord)}\\b", "i"));
+            return await _words.Find(filter).AnyAsync();
+        }
     }
 }

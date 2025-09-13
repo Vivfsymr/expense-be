@@ -22,5 +22,10 @@ namespace ExpenseBe.Core.Services
         {
             await _wordRepository.InsertAsync(word);
         }
+
+        public async Task<bool> ExistsByFirstWordAsync(string firstWord)
+        {
+            return await _wordRepository.ExistsByFirstWordAsync(firstWord);
+        }
     }
 }
