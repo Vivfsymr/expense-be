@@ -58,5 +58,32 @@ namespace ExpenseBe.API.Controllers
             await _wordService.InsertWordAsync(word);
             return Ok();
         }
+
+        [HttpGet("summary")]
+        public async Task<ActionResult<IEnumerable<object>>> GetWordSummaries([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
+        {
+            var words = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
+            var summaries = words.Select(w => new {
+                w._id,
+                body = GetFirstTwoSentences(w.body)
+            });
+            return Ok(summaries);
+        }
+
+        private static string GetFirstTwoSentences(string? text)
+        {
+            if (string.IsNullOrWhiteSpace(text)) return string.Empty;
+            var sentences = text.Split(new[] {"\\n"}, System.StringSplitOptions.RemoveEmptyEntries);
+            return string.Join(". ", sentences.Take(2)).Trim() + (sentences.Length > 2 ? "." : "");
+        }
+
+        [HttpGet("{id}")]
+        public async Task<ActionResult<Word>> GetById(string id)
+        {
+            var word = await _wordService.GetByIdAsync(id);
+            if (word == null)
+                return NotFound();
+            return Ok(word);
+        }
     }
 }

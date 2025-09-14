@@ -59,5 +59,21 @@ namespace ExpenseBe.Data.Repositories
             var filter = Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(firstWord)}\\b", "i"));
             return await _words.Find(filter).AnyAsync();
         }
+
+        public async Task<Word?> GetByIdAsync(string id)
+        {
+            try
+            {
+                if (!MongoDB.Bson.ObjectId.TryParse(id, out _))
+                    return null;
+                    
+                var filter = Builders<Word>.Filter.Eq(w => w._id, id);
+                return await _words.Find(filter).FirstOrDefaultAsync();
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }
