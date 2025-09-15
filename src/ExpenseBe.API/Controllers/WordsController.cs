@@ -95,6 +95,6 @@ namespace ExpenseBe.API.Controllers
 
             await _wordService.DeleteByIdAsync(id);
             return NoContent();
-        }1
+        }
     }
 }
