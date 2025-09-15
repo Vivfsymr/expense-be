@@ -75,5 +75,11 @@ namespace ExpenseBe.Data.Repositories
                 return null;
             }
         }
+
+        public async Task DeleteByIdAsync(string id)
+        {
+            var filter = Builders<Word>.Filter.Eq(w => w._id, id);
+            await _words.DeleteOneAsync(filter);
+        }
     }
 }

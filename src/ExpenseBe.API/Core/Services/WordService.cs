@@ -32,5 +32,10 @@ namespace ExpenseBe.Core.Services
         {
             return await _wordRepository.GetByIdAsync(id);
         }
+
+        public async Task DeleteByIdAsync(string id)
+        {
+            await _wordRepository.DeleteByIdAsync(id);
+        }
     }
 }

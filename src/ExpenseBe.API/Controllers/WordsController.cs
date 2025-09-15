@@ -85,5 +85,16 @@ namespace ExpenseBe.API.Controllers
                 return NotFound();
             return Ok(word);
         }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteById(string id)
+        {
+            var word = await _wordService.GetByIdAsync(id);
+            if (word == null)
+                return NotFound();
+
+            await _wordService.DeleteByIdAsync(id);
+            return NoContent();
+        }1
     }
 }
