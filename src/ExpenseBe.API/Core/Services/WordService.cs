@@ -37,5 +37,10 @@ namespace ExpenseBe.Core.Services
         {
             return await _wordRepository.SetBookMarkAsync(id, value);
         }
+        
+        public async Task DeleteByIdAsync(string id)
+        {
+            await _wordRepository.DeleteByIdAsync(id);
+        }
     }
 }
