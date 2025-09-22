@@ -11,5 +11,6 @@ namespace ExpenseBe.Core.Models
         public string? _id { get; set; }
         public string? body { get; set; }
         public DateTime createAt { get; set; }
+        public bool bookMark { get; set; } = false;
     }
 }

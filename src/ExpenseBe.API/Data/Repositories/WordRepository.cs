@@ -20,7 +20,7 @@ namespace ExpenseBe.Data.Repositories
             var filter = string.IsNullOrWhiteSpace(keyword)
                 ? Builders<Word>.Filter.Empty
                 : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression(keyword, "i"));
-            
+
             var sort = orderBy?.ToLower() switch
             {
                 "alpha" => Builders<Word>.Sort.Ascending(w => w.body),
@@ -45,7 +45,7 @@ namespace ExpenseBe.Data.Repositories
                 .Skip(offset)
                 .Limit(limit)
                 .ToListAsync();
-            
+
             return result;
         }
 
@@ -66,7 +66,7 @@ namespace ExpenseBe.Data.Repositories
             {
                 if (!MongoDB.Bson.ObjectId.TryParse(id, out _))
                     return null;
-                    
+
                 var filter = Builders<Word>.Filter.Eq(w => w._id, id);
                 return await _words.Find(filter).FirstOrDefaultAsync();
             }
@@ -74,6 +74,14 @@ namespace ExpenseBe.Data.Repositories
             {
                 return null;
             }
+        }
+
+        public async Task<bool> SetBookMarkAsync(string id, bool value)
+        {
+            var filter = Builders<Word>.Filter.Eq(w => w._id, id);
+            var update = Builders<Word>.Update.Set(w => w.bookMark, value);
+            var result = await _words.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
         }
     }
 }

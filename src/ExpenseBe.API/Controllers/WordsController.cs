@@ -20,7 +20,15 @@ namespace ExpenseBe.API.Controllers
             _wordService = new WordService(repo);
         }
 
-                [HttpGet]
+        [HttpPost("bookmark/{id}")]
+        public async Task<IActionResult> SetBookMark(string id, [FromQuery] bool value = true)
+        {
+            var result = await _wordService.SetBookMarkAsync(id, value);
+            if (!result) return NotFound();
+            return Ok();
+        }
+
+        [HttpGet]
         public async Task<ActionResult<IEnumerable<Word>>> GetWords([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
         {
             var words = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
@@ -63,7 +71,8 @@ namespace ExpenseBe.API.Controllers
         public async Task<ActionResult<IEnumerable<object>>> GetWordSummaries([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
         {
             var words = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
-            var summaries = words.Select(w => new {
+            var summaries = words.Select(w => new
+            {
                 w._id,
                 body = GetFirstTwoSentences(w.body)
             });
@@ -73,7 +82,7 @@ namespace ExpenseBe.API.Controllers
         private static string GetFirstTwoSentences(string? text)
         {
             if (string.IsNullOrWhiteSpace(text)) return string.Empty;
-            var sentences = text.Split(new[] {"\\n"}, System.StringSplitOptions.RemoveEmptyEntries);
+            var sentences = text.Split(new[] { "\\n" }, System.StringSplitOptions.RemoveEmptyEntries);
             return string.Join(". ", sentences.Take(2)).Trim() + (sentences.Length > 2 ? "." : "");
         }
 

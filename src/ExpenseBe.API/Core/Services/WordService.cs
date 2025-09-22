@@ -32,5 +32,10 @@ namespace ExpenseBe.Core.Services
         {
             return await _wordRepository.GetByIdAsync(id);
         }
+
+        public async Task<bool> SetBookMarkAsync(string id, bool value)
+        {
+            return await _wordRepository.SetBookMarkAsync(id, value);
+        }
     }
 }
