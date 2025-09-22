@@ -21,6 +21,17 @@ namespace ExpenseBe.Data.Repositories
                 ? Builders<Word>.Filter.Empty
                 : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression(keyword, "i"));
 
+            if (orderBy?.ToLower() == "bookmark")
+            {
+                var bookmarkFilter = Builders<Word>.Filter.And(filter, Builders<Word>.Filter.Eq(w => w.bookMark, true));
+                var result = await _words.Find(bookmarkFilter)
+                    .Sort(Builders<Word>.Sort.Descending(w => w.createAt))
+                    .Skip(offset)
+                    .Limit(limit)
+                    .ToListAsync();
+                return result;
+            }
+
             var sort = orderBy?.ToLower() switch
             {
                 "alpha" => Builders<Word>.Sort.Ascending(w => w.body),
@@ -40,13 +51,13 @@ namespace ExpenseBe.Data.Repositories
                     .Take(limit);
             }
 
-            var result = await _words.Find(filter)
+            var result2 = await _words.Find(filter)
                 .Sort(sort)
                 .Skip(offset)
                 .Limit(limit)
                 .ToListAsync();
 
-            return result;
+            return result2;
         }
 
         public async Task InsertAsync(Word word)
@@ -83,7 +94,7 @@ namespace ExpenseBe.Data.Repositories
             var result = await _words.UpdateOneAsync(filter, update);
             return result.ModifiedCount > 0;
         }
-        
+
         public async Task DeleteByIdAsync(string id)
         {
             var filter = Builders<Word>.Filter.Eq(w => w._id, id);
