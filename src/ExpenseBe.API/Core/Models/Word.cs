@@ -4,6 +4,11 @@ using System;
 
 namespace ExpenseBe.Core.Models
 {
+    public class WordListResult
+    {
+        public long total { get; set; }
+        public List<Word> items { get; set; } = new List<Word>();
+    }
     public class Word
     {
         [BsonId]

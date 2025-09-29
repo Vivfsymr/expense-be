@@ -13,7 +13,7 @@ namespace ExpenseBe.Core.Services
             _wordRepository = wordRepository;
         }
 
-        public async Task<IEnumerable<Word>> GetWordsAsync(string? keyword, string? orderBy, int offset = 0, int limit = 50)
+        public async Task<WordListResult> GetWordsAsync(string? keyword, string? orderBy, int offset = 0, int limit = 50)
         {
             return await _wordRepository.GetAllAsync(keyword, orderBy, offset, limit);
         }

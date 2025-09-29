@@ -15,23 +15,24 @@ namespace ExpenseBe.Data.Repositories
             _words = context.Words;
         }
 
-        public async Task<IEnumerable<Word>> GetAllAsync(string? keyword, string? orderBy, int offset = 0, int limit = 50)
+    public async Task<WordListResult> GetAllAsync(string? keyword, string? orderBy, int offset = 0, int limit = 50)
         {
             var filter = string.IsNullOrWhiteSpace(keyword)
                 ? Builders<Word>.Filter.Empty
                 : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression(keyword, "i"));
 
+            var result = new WordListResult();
             if (orderBy?.ToLower() == "bookmark")
             {
                 var bookmarkFilter = Builders<Word>.Filter.And(filter, Builders<Word>.Filter.Eq(w => w.bookMark, true));
-                var result = await _words.Find(bookmarkFilter)
+                result.total = await _words.CountDocumentsAsync(bookmarkFilter);
+                result.items = await _words.Find(bookmarkFilter)
                     .Sort(Builders<Word>.Sort.Descending(w => w.createAt))
                     .Skip(offset)
                     .Limit(limit)
                     .ToListAsync();
                 return result;
             }
-
             var sort = orderBy?.ToLower() switch
             {
                 "alpha" => Builders<Word>.Sort.Ascending(w => w.body),
@@ -41,23 +42,23 @@ namespace ExpenseBe.Data.Repositories
                 "random" => null, // Random sẽ xử lý riêng
                 _ => Builders<Word>.Sort.Descending(w => w.createAt)
             };
-
             if (orderBy?.ToLower() == "random")
             {
-                // Random: lấy tất cả rồi shuffle (chỉ nên dùng với ít data)
                 var allResults = await _words.Find(filter).ToListAsync();
-                return allResults.OrderBy(_ => Guid.NewGuid())
+                result.total = allResults.Count;
+                result.items = allResults.OrderBy(_ => Guid.NewGuid())
                     .Skip(offset)
-                    .Take(limit);
+                    .Take(limit)
+                    .ToList();
+                return result;
             }
-
-            var result2 = await _words.Find(filter)
+            result.total = await _words.CountDocumentsAsync(filter);
+            result.items = await _words.Find(filter)
                 .Sort(sort)
                 .Skip(offset)
                 .Limit(limit)
                 .ToListAsync();
-
-            return result2;
+            return result;
         }
 
         public async Task InsertAsync(Word word)

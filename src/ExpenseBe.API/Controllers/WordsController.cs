@@ -29,10 +29,10 @@ namespace ExpenseBe.API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Word>>> GetWords([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
+        public async Task<ActionResult<WordListResult>> GetWords([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
         {
-            var words = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
-            return Ok(words);
+            var result = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
+            return Ok(result);
         }
 
         [HttpPost]
@@ -70,12 +70,12 @@ namespace ExpenseBe.API.Controllers
         [HttpGet("summary")]
         public async Task<ActionResult<IEnumerable<object>>> GetWordSummaries([FromQuery] string? keyword, [FromQuery] string? orderBy, [FromQuery] int offset = 0, [FromQuery] int limit = 50)
         {
-            var words = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
-            var summaries = words.Select(w => new
-            {
+            var result = await _wordService.GetWordsAsync(keyword, orderBy, offset, limit);
+            var summaries = result.items.Select(w => new {
                 w._id,
                 body = GetFirstTwoSentences(w.body)
             });
+            return Ok(new { total = result.total, items = summaries });
             return Ok(summaries);
         }
 
