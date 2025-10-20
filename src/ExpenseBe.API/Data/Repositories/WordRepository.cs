@@ -19,7 +19,7 @@ namespace ExpenseBe.Data.Repositories
         {
             var filter = string.IsNullOrWhiteSpace(keyword)
                 ? Builders<Word>.Filter.Empty
-                : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression(keyword, "i"));
+                : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(keyword)}\\b", "i"));
 
             var result = new WordListResult();
             if (orderBy?.ToLower() == "bookmark")
