@@ -1,3 +1,7 @@
+        public async Task<long> SetAllBookMarkTrueAsync()
+        {
+            return await _wordRepository.SetAllBookMarkTrueAsync();
+        }
 using ExpenseBe.Core.Models;
 using ExpenseBe.Data.Repositories;
 using System.Collections.Generic;

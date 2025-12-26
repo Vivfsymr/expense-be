@@ -1,3 +1,9 @@
+        [HttpPost("bookmark-all-true")]
+        public async Task<IActionResult> SetAllBookMarkTrue()
+        {
+            var count = await _wordService.SetAllBookMarkTrueAsync();
+            return Ok(new { updated = count });
+        }
 using ExpenseBe.Core.Models;
 using ExpenseBe.Core.Services;
 using ExpenseBe.Data.Context;

@@ -69,6 +69,15 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 
+
+// Gọi cập nhật bookMark=true cho tất cả Word khi app khởi động
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+    var wordRepo = new WordRepository(dbContext);
+    await wordRepo.SetAllBookMarkTrueAsync();
+}
+
 app.MapControllers();
 
 app.Run();

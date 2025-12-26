@@ -88,6 +88,15 @@ namespace ExpenseBe.Data.Repositories
             }
         }
 
+
+        public async Task<long> SetAllBookMarkTrueAsync()
+        {
+            var filter = Builders<Word>.Filter.Ne(w => w.bookMark, true);
+            var update = Builders<Word>.Update.Set(w => w.bookMark, true);
+            var result = await _words.UpdateManyAsync(filter, update);
+            return result.ModifiedCount;
+        }
+
         public async Task<bool> SetBookMarkAsync(string id, bool value)
         {
             var filter = Builders<Word>.Filter.Eq(w => w._id, id);
