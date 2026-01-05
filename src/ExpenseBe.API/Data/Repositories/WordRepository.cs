@@ -19,7 +19,7 @@ namespace ExpenseBe.Data.Repositories
         {
             var filter = string.IsNullOrWhiteSpace(keyword)
                 ? Builders<Word>.Filter.Empty
-                : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(keyword)}\\b", "i"));
+                : Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(keyword)}", "i"));
 
             var result = new WordListResult();
             if (orderBy?.ToLower() == "bookmark")
@@ -68,7 +68,7 @@ namespace ExpenseBe.Data.Repositories
 
         public async Task<bool> ExistsByFirstWordAsync(string firstWord)
         {
-            var filter = Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(firstWord)}\\b", "i"));
+            var filter = Builders<Word>.Filter.Regex(w => w.body, new MongoDB.Bson.BsonRegularExpression($"^{System.Text.RegularExpressions.Regex.Escape(firstWord)}", "i"));
             return await _words.Find(filter).AnyAsync();
         }
 
