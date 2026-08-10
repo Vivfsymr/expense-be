@@ -1,7 +1,6 @@
+using ExpenseBe.API.DTOs;
 using ExpenseBe.Core.Models;
 using ExpenseBe.Core.Services;
-using ExpenseBe.Data.Context;
-using ExpenseBe.Data.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +13,12 @@ namespace ExpenseBe.API.Controllers
     public class WordsController : ControllerBase
     {
         private readonly WordService _wordService;
-        public WordsController(MongoDbContext context)
+        private readonly IAiWordGenerator _aiWordGenerator;
+
+        public WordsController(WordService wordService, IAiWordGenerator aiWordGenerator)
         {
-            var repo = new WordRepository(context);
-            _wordService = new WordService(repo);
+            _wordService = wordService;
+            _aiWordGenerator = aiWordGenerator;
         }
 
         [HttpPost("bookmark/{id}")]
@@ -65,6 +66,62 @@ namespace ExpenseBe.API.Controllers
             };
             await _wordService.InsertWordAsync(word);
             return Ok();
+        }
+
+        [HttpPost("ai")]
+        public async Task<IActionResult> InsertWordFromAi([FromBody] AiWordRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Word))
+                return BadRequest("Word is required");
+
+            var input = request.Word.Trim();
+            var exists = await _wordService.ExistsByFirstWordAsync(input);
+            if (exists)
+                return Conflict($"Từ đầu tiên '{input}' đã được add trước đó!");
+
+            string body;
+            try
+            {
+                body = await _aiWordGenerator.GenerateAsync(input);
+            }
+            catch (System.InvalidOperationException ex)
+            {
+                return StatusCode(502, ex.Message);
+            }
+
+            if (string.IsNullOrWhiteSpace(body))
+                return StatusCode(502, "Gemini returned empty content.");
+
+            var word = new Word
+            {
+                body = body,
+                createAt = System.DateTime.UtcNow
+            };
+            await _wordService.InsertWordAsync(word);
+            return Ok(new { word._id, word.body });
+        }
+
+        [HttpPost("ai/lookup")]
+        public async Task<IActionResult> LookupWordFromAi([FromBody] AiWordRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Word))
+                return BadRequest("Word is required");
+
+            var input = request.Word.Trim();
+            string body;
+            try
+            {
+                body = await _aiWordGenerator.GenerateAsync(input);
+            }
+            catch (System.InvalidOperationException ex)
+            {
+                return StatusCode(502, ex.Message);
+            }
+
+            if (string.IsNullOrWhiteSpace(body))
+                return StatusCode(502, "Gemini returned empty content.");
+
+            return Ok(new { word = input, body });
         }
 
         [HttpGet("summary")]

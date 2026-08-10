@@ -1,4 +1,5 @@
 using ExpenseBe.Core.Interfaces;
+using ExpenseBe.Core.Options;
 using ExpenseBe.Core.Services;
 using ExpenseBe.Data.Context;
 using ExpenseBe.Data.Repositories;
@@ -17,8 +18,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend",
-        policy =>
-        {
+    policy =>
+    {
             policy.AllowAnyOrigin()
                   .AllowAnyHeader()
                   .AllowAnyMethod();
@@ -28,11 +29,25 @@ builder.Services.AddCors(options =>
 // Add MongoDB Context
 builder.Services.AddSingleton<MongoDbContext>();
 
+builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection(GeminiOptions.SectionName));
+
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<WordRepository>();
 
 // Add Services
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<WordService>();
+builder.Services.AddHttpClient<IAiWordGenerator, GeminiWordGenerator>((sp, client) =>
+{
+    var options = sp.GetRequiredService<Microsoft.Extensions.Options.IOptions<GeminiOptions>>().Value;
+    var baseUrl = string.IsNullOrWhiteSpace(options.BaseUrl)
+        ? "https://generativelanguage.googleapis.com/v1beta/"
+        : options.BaseUrl;
+    if (!baseUrl.EndsWith('/'))
+        baseUrl += "/";
+    client.BaseAddress = new Uri(baseUrl);
+});
 
 // JWT Authentication
 builder.Services.AddAuthentication(options =>
