@@ -32,7 +32,7 @@ namespace ExpenseBe.Core.Services
             if (string.IsNullOrWhiteSpace(_options.ApiKey))
                 throw new InvalidOperationException("Gemini API key is not configured.");
 
-            var model = string.IsNullOrWhiteSpace(_options.Model) ? "gemini-2.0-flash" : _options.Model.Trim();
+            var model = string.IsNullOrWhiteSpace(_options.Model) ? "gemini-3.5-flash" : _options.Model.Trim();
             var request = new GenerateContentRequest
             {
                 SystemInstruction = new Content

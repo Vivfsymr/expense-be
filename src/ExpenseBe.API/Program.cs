@@ -29,7 +29,19 @@ builder.Services.AddCors(options =>
 // Add MongoDB Context
 builder.Services.AddSingleton<MongoDbContext>();
 
-builder.Services.Configure<GeminiOptions>(builder.Configuration.GetSection(GeminiOptions.SectionName));
+builder.Services.Configure<GeminiOptions>(options =>
+{
+    builder.Configuration.GetSection(GeminiOptions.SectionName).Bind(options);
+
+    // Render / host secrets: prefer Gemini__ApiKey, fallback GEMINI_API_KEY
+    if (string.IsNullOrWhiteSpace(options.ApiKey))
+        options.ApiKey = builder.Configuration["GEMINI_API_KEY"] ?? string.Empty;
+
+    // Optional override only — keep Model from appsettings (Gemini:Model) by default
+    var modelOverride = builder.Configuration["GEMINI_MODEL"];
+    if (!string.IsNullOrWhiteSpace(modelOverride))
+        options.Model = modelOverride;
+});
 
 // Add Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
