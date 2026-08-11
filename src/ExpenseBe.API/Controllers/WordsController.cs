@@ -133,7 +133,17 @@ namespace ExpenseBe.API.Controllers
                 body = GetFirstTwoSentences(w.body)
             });
             return Ok(new { total = result.total, items = summaries });
-            return Ok(summaries);
+        }
+
+        [HttpGet("quiz")]
+        public async Task<ActionResult<WordQuizResult>> GetQuiz(
+            [FromQuery] string? keyword,
+            [FromQuery] string? orderBy,
+            [FromQuery] int offset = 0,
+            [FromQuery] int limit = 50)
+        {
+            var result = await _wordService.GetQuizAsync(keyword, orderBy, offset, limit);
+            return Ok(result);
         }
 
         private static string GetFirstTwoSentences(string? text)

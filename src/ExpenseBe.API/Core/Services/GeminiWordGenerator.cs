@@ -118,11 +118,12 @@ Lặp lại format trên cho các nghĩa QUAN TRỌNG khác của từ.
 * Chỉ đưa các nghĩa thực tế, phổ biến và hữu ích cho người học.
 * Ưu tiên nghĩa thường gặp trong giao tiếp, công việc và tiếng Anh hiện đại.
 * Không cố đưa các nghĩa hiếm chỉ để làm danh sách dài.
-* Nếu một nghĩa có cách dùng đặc biệt hoặc thuộc lĩnh vực riêng nhưng vẫn đáng biết, có thể thêm emoji phù hợp như 📌, 🔬, 📄...
 * Mỗi nghĩa phải có ít nhất 1 ví dụ tiếng Anh tự nhiên.
 * Ví dụ phải thể hiện ĐÚNG nghĩa đang giải thích.
 * Dịch tiếng Việt tự nhiên, dễ hiểu.
 * Nếu nghĩa chính đặc biệt quan trọng, đánh dấu `✅` và có thể ghi `(nghĩa chính – ...)`.
+* Nếu nghĩa phụ đặc biệt quan trọng, đánh dấu `📌` và có thể ghi `(nghĩa phụ – ...)`.
+* Lưu ý là chỉ dung 2 icon `✅` và `📌` cho nghĩa phụ, không dùng các icon khác.
 * Không giải thích dài dòng.
 
 ### WORD FAMILY / TỪ LIÊN QUAN
@@ -216,7 +217,7 @@ The city attracts millions of tourists every year.
 She is attracted to his confidence.
 → Cô ấy bị thu hút bởi sự tự tin của anh ấy.
 
-(verb) Thu hút (về mặt vật lý / khoa học) 🔬
+(verb) Thu hút (về mặt vật lý / khoa học) 📌
 Magnets attract iron.
 → Nam châm hút sắt.
 
